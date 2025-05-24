@@ -24,9 +24,12 @@
   "author": "Matt Galligan",
   "type": "module",
   "scripts": {
-    "inventory": "node .grepa/scripts/inventory.js",
-    "inventory:py": "python3 .grepa/scripts/inventory.py",
-    "test": "echo \"No tests yet - using ripgrep directly\""
+    "inventory": "node scripts/inventory.js",
+    "inventory:py": "python3 scripts/inventory.py",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "clean": "pnpm -r clean",
+    "dev": "pnpm -r dev"
   },
   "engines": {
     "node": ">=18.0.0"

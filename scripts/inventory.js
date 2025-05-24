@@ -41,7 +41,6 @@ function parseArgs(config) {
     anchor: config.anchor || DEFAULT_ANCHOR,
     ignorePatterns: [],
     ignoreExamples: false,
-    noGitignore: false,
     configPath: null
   };
   
@@ -50,8 +49,6 @@ function parseArgs(config) {
       args.ignorePatterns.push(argv[++i]);
     } else if (argv[i] === '--ignore-examples') {
       args.ignoreExamples = true;
-    } else if (argv[i] === '--no-gitignore') {
-      args.noGitignore = true;
     } else if (argv[i] === '--config' && i + 1 < argv.length) {
       args.configPath = argv[++i];
     } else if (!argv[i].startsWith('--')) {
@@ -105,10 +102,14 @@ function isInMarkdownConstruct(filename, lineNum, anchorMatch, config, fileCache
     }
     
     const currentLine = lines[lineNum - 1];
-    const examplesConfig = config.examples || {};
+    const docsExamplesConfig = config.docsExamples || {};
+    
+    // Get include/exclude lists
+    const includeList = docsExamplesConfig.include || [];
+    const excludeList = docsExamplesConfig.exclude || [];
     
     // Check code fences (```)
-    if (examplesConfig.detectCodeFences !== false) {
+    if (excludeList.includes('codeFences')) {
       let inCodeFence = false;
       for (let i = 0; i < lineNum - 1; i++) {
         if (lines[i].trim().startsWith('```')) {
@@ -121,21 +122,21 @@ function isInMarkdownConstruct(filename, lineNum, anchorMatch, config, fileCache
     }
     
     // Check code blocks (4-space indentation)
-    if (examplesConfig.detectCodeBlocks !== false) {
+    if (excludeList.includes('codeBlocks')) {
       if (currentLine.startsWith('    ') && currentLine.includes(anchorMatch)) {
         return true;
       }
     }
     
     // Check headings (lines starting with #)
-    if (examplesConfig.detectHeadings) {
+    if (excludeList.includes('headings')) {
       if (HEADING_PATTERN.test(currentLine)) {
         return true;
       }
     }
     
     // Check inline code (text between backticks)
-    if (examplesConfig.detectInlineCode) {
+    if (excludeList.includes('inlineCode')) {
       const anchorPos = currentLine.indexOf(anchorMatch);
       if (anchorPos !== -1) {
         const matches = [...currentLine.matchAll(INLINE_CODE_PATTERN)];
@@ -148,7 +149,7 @@ function isInMarkdownConstruct(filename, lineNum, anchorMatch, config, fileCache
     }
     
     // Check links [text](url)
-    if (examplesConfig.detectLinks) {
+    if (excludeList.includes('links')) {
       const anchorPos = currentLine.indexOf(anchorMatch);
       if (anchorPos !== -1) {
         const matches = [...currentLine.matchAll(LINK_PATTERN)];
@@ -161,14 +162,14 @@ function isInMarkdownConstruct(filename, lineNum, anchorMatch, config, fileCache
     }
     
     // Check blockquotes (lines starting with >)
-    if (examplesConfig.detectBlockquotes) {
+    if (excludeList.includes('blockquotes')) {
       if (BLOCKQUOTE_PATTERN.test(currentLine)) {
         return true;
       }
     }
     
-    // Check HTML comments
-    if (examplesConfig.detectHtmlComments) {
+    // Check HTML comments (only if NOT in include list)
+    if (!includeList.includes('htmlComments')) {
       // Check if we're inside an HTML comment
       const fullText = lines.slice(0, lineNum).join('\n');
       const commentCount = (fullText.match(/<!--/g) || []).length;
@@ -191,8 +192,8 @@ function isInMarkdownConstruct(filename, lineNum, anchorMatch, config, fileCache
       }
     }
     
-    // Check front matter (YAML/TOML between --- or +++)
-    if (examplesConfig.detectFrontMatter) {
+    // Check front matter (only if NOT in include list)
+    if (!includeList.includes('frontMatter')) {
       if (lineNum === 1) {
         return false;
       }
@@ -223,27 +224,25 @@ function findGrepAnchors(anchor = DEFAULT_ANCHOR, ignorePatterns = [], ignoreExa
     // Run ripgrep to find all anchors
     // -n: line numbers, -o: only matching, --no-heading: compact format
     // Always exclude .git directory
-    let rgCommand = `rg -n -o "${anchor}[^\\\\s]*" --no-heading -g "!.git/"`;
+    // Use same pattern as Python version
+    const args = ['rg', '-n', '-o', `${anchor}[^\\s]*`, '--no-heading', '-g', '!.git/'];
+    let rgCommand = args.join(' ');
     
-    // Check if we should respect gitignore
-    const ignoreConfig = config.ignore || {};
-    if (ignoreConfig.respectGitignore) {
-      // Check if .gitignore exists
-      const gitignorePath = join(process.cwd(), '.gitignore');
-      if (existsSync(gitignorePath)) {
-        // Add .gitignore patterns
-        rgCommand += ` --ignore-file "${gitignorePath}"`;
-      }
-      // Otherwise ripgrep respects .gitignore by default
-    } else {
-      // Explicitly disable gitignore
-      rgCommand += ' --no-ignore-vcs';
+    // Always respect .gitignore and other VCS ignore files by default.
+    // Let ripgrep use its default behavior for discovering and respecting ignore files.
+    // Explicitly add the root .gitignore if it exists to ensure it's considered.
+    const gitignorePath = join(process.cwd(), '.gitignore');
+    if (existsSync(gitignorePath)) {
+      rgCommand += ` --ignore-file "${gitignorePath}"`;
     }
+    // ripgrep will also look for other standard ignore files like .rgignore, .git/info/exclude,
+    // and .gitignore files in parent directories as per its default behavior.
     
     // Resolve ignore patterns from config and command line
     const allPatterns = [];
     
     // Add active patterns from config file
+    const ignoreConfig = config.ignore || {};
     const patternDefs = ignoreConfig.patterns || {};
     for (const [patternName, patternDef] of Object.entries(patternDefs)) {
       if (patternDef.active) {
@@ -414,13 +413,7 @@ function main() {
     }
     
     // Override config with command line args
-    const ignoreExamples = args.ignoreExamples || (config.examples?.ignore || false);
-    
-    // Handle gitignore override
-    if (args.noGitignore) {
-      if (!config.ignore) config.ignore = {};
-      config.ignore.respectGitignore = false;
-    }
+    const ignoreExamples = args.ignoreExamples || (config.docsExamples?.ignore || false);
     
     const data = findGrepAnchors(args.anchor, args.ignorePatterns, ignoreExamples, config);
     const report = generateReport(data);

@@ -2,7 +2,7 @@
 <!-- :ga:tldr Automate grep-anchor workflows with scripts and tools -->
 <!-- :ga:guide How to use and create scripts for grep-anchor automation -->
 
-Automate grep-anchor workflows with scripts from the `.grepa/scripts` directory.
+Automate grep-anchor workflows with scripts from the `scripts` directory.
 
 ## Quick Start
 
@@ -10,13 +10,13 @@ The `.grepa` directory contains ready-to-use scripts for common tasks:
 
 ```bash
 # Generate an inventory of all grep-anchors
-.grepa/scripts/inventory.js
+scripts/inventory.js
 
 # Or use the Python version
-.grepa/scripts/inventory.py
+scripts/inventory.py
 
 # Use with custom anchor
-.grepa/scripts/inventory.js :proj:
+scripts/inventory.js :proj:
 ```
 
 ## inventory Script
@@ -29,7 +29,7 @@ The `inventory` script scans your codebase and generates a comprehensive invento
 - **Tag statistics**: Shows usage counts and file locations
 - **File analysis**: Lists which files have the most anchors
 - **Custom anchors**: Works with any anchor pattern (`:ga:`, `:proj:`, etc.)
-- **JSONC output**: Generates `.grepa/inventory.generated.json` with full details
+- **JSONC output**: Generates `scripts/inventory.generated.json` with full details
 - **Flexible filtering**: 
   - `--ignore-md`: Skip markdown files (useful for documentation-heavy repos)
   - `--ignore-examples`: Skip anchors in code blocks (avoids counting examples)
@@ -38,15 +38,15 @@ The `inventory` script scans your codebase and generates a comprehensive invento
 
 ```bash
 # Basic usage (scans for :ga: anchors)
-.grepa/scripts/inventory.js
+scripts/inventory.js
 
 # With options
-.grepa/scripts/inventory.js --ignore md         # Ignore markdown files
-.grepa/scripts/inventory.js --ignore-examples   # Ignore code examples in docs
-.grepa/scripts/inventory.js --ignore md --ignore-examples  # Both options
+scripts/inventory.js --ignore md         # Ignore markdown files
+scripts/inventory.js --ignore-examples   # Ignore code examples in docs
+scripts/inventory.js --ignore md --ignore-examples  # Both options
 
 # Custom anchor
-.grepa/scripts/inventory.py :tc:
+scripts/inventory.py :tc:
 
 # Output
 🔍 Searching for grep-anchors...
@@ -57,7 +57,7 @@ The `inventory` script scans your codebase and generates a comprehensive invento
 🚫 Ignored code examples
 📊 Found 47 anchors across 12 files
 🏷️  Discovered 15 unique tags
-📄 Report saved to: .grepa/inventory.generated.json
+📄 Report saved to: scripts/inventory.generated.json
 
 🔝 Top 5 tags:
    todo: 12 uses in 8 file(s)
@@ -69,7 +69,7 @@ The `inventory` script scans your codebase and generates a comprehensive invento
 
 ### Output Format
 
-The generated `.grepa/inventory.generated.json` contains:
+The generated `scripts/inventory.generated.json` contains:
 
 ```jsonc
 {
@@ -262,7 +262,7 @@ Add to `.git/hooks/pre-commit`:
 ```bash
 #!/bin/bash
 # Generate fresh inventory before each commit
-.grepa/scripts/inventory.js
+scripts/inventory.js
 ```
 
 ### CI/CD
@@ -271,7 +271,7 @@ Add to `.git/hooks/pre-commit`:
 # GitHub Actions example
 - name: Generate grep-anchor inventory
   run: |
-    .grepa/scripts/inventory.py
+    scripts/inventory.py
     # Upload as artifact
     
 - name: Check for critical issues
@@ -289,7 +289,7 @@ Add to `.git/hooks/pre-commit`:
 {
   "label": "Update Grepa Inventory",
   "type": "shell",
-  "command": ".grepa/scripts/inventory.js",
+  "command": "scripts/inventory.js",
   "problemMatcher": []
 }
 ```
@@ -305,7 +305,7 @@ Add to `.git/hooks/pre-commit`:
 ## Tips
 
 - Scripts can accept custom anchors as arguments
-- Output is always `.grepa/inventory.generated.json` (git-ignored)
+- Output is always `scripts/inventory.generated.json` (git-ignored)
 - Both JS and Python versions produce identical output
 - Use the inventory for dashboards and reporting
 

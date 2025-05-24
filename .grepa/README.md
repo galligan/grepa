@@ -1,6 +1,6 @@
-# Grepa Scripts
+# Grepa Tools
 
-This directory contains tools and scripts for working with grep-anchors.
+This directory contains configuration files for grepa tools. The actual scripts are located in the `/scripts` directory at the project root.
 
 ## inventory
 
@@ -10,16 +10,16 @@ The `inventory` script discovers all grep-anchors in your codebase and generates
 
 ```bash
 # Run with default settings
-python3 .grepa/scripts/inventory.py
+python3 scripts/inventory.py
 
 # Or using Node.js
-node .grepa/scripts/inventory.js
+node scripts/inventory.js
 
 # Ignore documentation files
-python3 .grepa/scripts/inventory.py --ignore docs
+python3 scripts/inventory.py --ignore docs
 
 # Ignore markdown files and code examples
-python3 .grepa/scripts/inventory.py --ignore md --ignore-examples
+python3 scripts/inventory.py --ignore md --ignore-examples
 ```
 
 ### Configuration
@@ -49,10 +49,10 @@ The script can be configured using `.grepa/inventory.config.json`. This allows y
     "respectGitignore": true    // Respect .gitignore patterns
   },
   
-  "examples": {
-    "ignore": false,            // Ignore anchors in code examples
-    "detectCodeBlocks": true,   // Detect indented code blocks
-    "detectCodeFences": true    // Detect ``` code fences
+  "docsExamples": {
+    "ignore": true,             // Ignore anchors in documentation examples
+    "include": ["frontMatter", "htmlComments"],  // Include these constructs
+    "exclude": ["codeBlocks", "codeFences", "headings", "inlineCode", "links", "blockquotes", "tables"]  // Exclude these
   },
   
   "output": {
@@ -90,16 +90,16 @@ You can ignore files using:
 Examples:
 ```bash
 # Ignore all documentation
-python3 .grepa/scripts/inventory.py --ignore docs
+python3 scripts/inventory.py --ignore docs
 
 # Ignore test files
-python3 .grepa/scripts/inventory.py --ignore "*.test.js"
+python3 scripts/inventory.py --ignore "*.test.js"
 
 # Multiple ignores
-python3 .grepa/scripts/inventory.py --ignore md --ignore "*.spec.ts"
+python3 scripts/inventory.py --ignore md --ignore "*.spec.ts"
 
 # Override gitignore respect from config
-python3 .grepa/scripts/inventory.py --no-gitignore
+python3 scripts/inventory.py --no-gitignore
 ```
 
 ### Output

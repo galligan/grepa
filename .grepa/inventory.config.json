@@ -21,21 +21,13 @@
         "active": false
       }
     },
-    "custom": [],
-    "respectGitignore": true
+    "custom": []
   },
   
-  "examples": {
+  "docsExamples": {
     "ignore": true,
-    "detectCodeBlocks": true,
-    "detectCodeFences": true,
-    "detectHeadings": true,
-    "detectInlineCode": true,
-    "detectLinks": false,
-    "detectBlockquotes": false,
-    "detectHtmlComments": true,
-    "detectTables": false,
-    "detectFrontMatter": true
+    "include": ["frontMatter", "htmlComments"],
+    "exclude": ["codeBlocks", "codeFences", "headings", "inlineCode", "links", "blockquotes", "tables"]
   },
   
   "output": {

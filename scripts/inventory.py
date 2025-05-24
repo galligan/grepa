@@ -55,10 +55,14 @@ def is_in_markdown_construct(filename: str, line_num: int, anchor_match: str, co
             return False
             
         current_line = lines[line_num - 1]
-        examples_config = config.get('examples', {})
+        docs_examples_config = config.get('docsExamples', {})
+        
+        # Get include/exclude lists
+        include_list = docs_examples_config.get('include', [])
+        exclude_list = docs_examples_config.get('exclude', [])
         
         # Check code fences (```)
-        if examples_config.get('detectCodeFences', True):
+        if 'codeFences' in exclude_list:
             in_code_fence = False
             for i, line in enumerate(lines[:line_num], 1):
                 if line.strip().startswith('```'):
@@ -67,17 +71,17 @@ def is_in_markdown_construct(filename: str, line_num: int, anchor_match: str, co
                 return True
         
         # Check code blocks (4-space indentation)
-        if examples_config.get('detectCodeBlocks', True):
+        if 'codeBlocks' in exclude_list:
             if current_line.startswith('    ') and anchor_match in current_line:
                 return True
         
         # Check headings (lines starting with #)
-        if examples_config.get('detectHeadings', False):
+        if 'headings' in exclude_list:
             if HEADING_PATTERN.match(current_line):
                 return True
         
         # Check inline code (text between backticks)
-        if examples_config.get('detectInlineCode', False):
+        if 'inlineCode' in exclude_list:
             anchor_pos = current_line.find(anchor_match)
             if anchor_pos != -1:  # Only check if anchor is found
                 for match in INLINE_CODE_PATTERN.finditer(current_line):
@@ -85,7 +89,7 @@ def is_in_markdown_construct(filename: str, line_num: int, anchor_match: str, co
                         return True
         
         # Check links [text](url)
-        if examples_config.get('detectLinks', False):
+        if 'links' in exclude_list:
             anchor_pos = current_line.find(anchor_match)
             if anchor_pos != -1:  # Only check if anchor is found
                 for match in LINK_PATTERN.finditer(current_line):
@@ -93,12 +97,12 @@ def is_in_markdown_construct(filename: str, line_num: int, anchor_match: str, co
                         return True
         
         # Check blockquotes (lines starting with >)
-        if examples_config.get('detectBlockquotes', False):
+        if 'blockquotes' in exclude_list:
             if BLOCKQUOTE_PATTERN.match(current_line):
                 return True
         
-        # Check HTML comments
-        if examples_config.get('detectHtmlComments', False):
+        # Check HTML comments (only if NOT in include list)
+        if 'htmlComments' not in include_list:
             # Check if we're inside an HTML comment
             full_text = ''.join(lines[:line_num])
             in_comment = full_text.count('<!--') > full_text.count('-->')
@@ -115,8 +119,8 @@ def is_in_markdown_construct(filename: str, line_num: int, anchor_match: str, co
                 elif comment_start < anchor_pos < comment_end:
                     return True
         
-        # Check front matter (YAML/TOML between --- or +++)
-        if examples_config.get('detectFrontMatter', False):
+        # Check front matter (only if NOT in include list)
+        if 'frontMatter' not in include_list:
             if line_num == 1:
                 return False
             # Check if we're in front matter
@@ -379,7 +383,7 @@ def main():
                 sys.exit(1)
     
     # Override config with command line args
-    ignore_examples = args.ignore_examples or config.get('examples', {}).get('ignore', False)
+    ignore_examples = args.ignore_examples or config.get('docsExamples', {}).get('ignore', False)
     
     # Handle gitignore override
     if args.no_gitignore:
