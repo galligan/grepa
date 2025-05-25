@@ -6,7 +6,7 @@
 
 Every grep-anchor follows this pattern:
 
-```
+```text
 <comment-leader> :ga:payload
 ```
 

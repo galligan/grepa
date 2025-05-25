@@ -2,7 +2,7 @@
 <!-- :ga:tldr Real-world examples of grep-anchor usage patterns -->
 <!-- :ga:example Comprehensive examples for AI agents and developers -->
 
-*Real-world patterns for AI agents and developers*
+*Examples and patterns for working with grep-anchors*
 
 ---
 
@@ -467,4 +467,4 @@ rg ":ga:tmp.*2024"
    # :ga:dragon - here be dragons, proceed carefully
    ```
 
-Remember: The goal is to make your codebase discoverable for both human developers and AI agents. Well-placed grep-anchors act as semantic waypoints through your code.
+The goal is to help make codebases more discoverable. Well-placed grep-anchors can serve as waypoints through your code.

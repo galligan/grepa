@@ -43,13 +43,13 @@ These insights justify a **single, four-byte sigil** (`:ga:`) and a tiny grammar
 
 ---
 
-## 4. Why `:ga:` is still new
+## 4. What `:ga:` adds to the conversation
 
-* Unifies many siloed patterns under **one** token.
-* Supports **structured payloads** (JSON, arrays) out-of-the-box.
-* Explicitly targets **AI agents** as first-class consumers, not just humans or compilers.
+* Suggests unifying many patterns under a single token
+* Supports structured payloads (JSON, arrays) for richer metadata
+* Considers AI agents alongside humans as consumers of code comments
 
-In other words, `:ga:` is evolutionary, not revolutionary: it packages decades of hard-won practice into a portable, OSS-friendly spec.
+The `:ga:` pattern builds on decades of existing practice, packaging these ideas into a simple, portable approach.
 
 ---
 

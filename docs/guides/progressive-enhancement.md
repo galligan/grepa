@@ -256,6 +256,6 @@ function processPayment(amount) {
 }
 ```
 
-## Remember
+## Keep It Simple
 
-The goal is **discoverability**, not perfection. Even one `:ga:` marker makes your codebase more navigable than none. Start where you are, use what works, and let your patterns grow naturally with your needs. 
+The goal is discoverability, not perfection. Even one `:ga:` marker can help make your codebase more navigable. Start where you are, use what works, and let your patterns grow naturally with your needs. 

@@ -6,13 +6,13 @@ Core grep-anchor patterns that work across all projects.
 
 ## Tag Philosophy: Keep It Terse
 
-**Shorter is better.** Grep-anchors should be quick to type and easy to search:
-- ✅ `sec` not `security`
-- ✅ `perf` not `performance` 
-- ✅ `ctx` not `context`
-- ✅ `tmp` not `temporary`
+**Consider using shorter tags.** They're quicker to type and easier to search:
+- `sec` instead of `security`
+- `perf` instead of `performance` 
+- `ctx` instead of `context`
+- `tmp` instead of `temporary`
 
-Why? Because you'll type these hundreds of times. Every character counts.
+Shorter tags can be helpful when you're using them frequently.
 
 ## Essential Patterns
 
@@ -232,11 +232,11 @@ Combine tags judiciously for closely related concerns:
 // :ga:api,docs,breaking,v2,urgent v2 changes signature
 ```
 
-## Tips
+## Suggestions
 
-1. **Start with tldr** - `:ga:tldr` for summaries is the most universally useful
-2. **Add todo and context** - These three cover 80% of use cases
-3. **Be consistent** - Pick a style and stick to it
-4. **Keep it searchable** - The whole point is grep-ability
-5. **Document your choices** - List your patterns in README
-6. **Let it evolve** - Add patterns as you need them
+- **Start with tldr** - `:ga:tldr` for summaries can be widely useful
+- **Add todo and context** - These three patterns cover many use cases
+- **Be consistent** - Picking a style and sticking to it helps
+- **Keep it searchable** - Grep-ability is a key benefit
+- **Document your choices** - Consider listing your patterns in README
+- **Let it evolve** - Add patterns as you discover needs

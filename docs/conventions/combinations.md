@@ -51,7 +51,7 @@ def process_payment(amount):
 
 ## Best Practices
 
-1. **Order matters**: Place most important tag first
+1. **Order matters**: Place the most important tag first
 2. **Limit chains**: Use 2-3 tags maximum for readability
 3. **Avoid redundancy**: Don't combine tags with similar meanings
 4. **Line length**: Keep lines under ~80 chars for better grep output

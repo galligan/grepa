@@ -137,13 +137,13 @@ Conventions for AI agent delegation and interaction.
 // :ga:frontend@copilot,backend@agent
 ```
 
-## Best Practices
+## Working with AI Agents
 
-1. **Be Specific**: Tell agents exactly what you need
-2. **Add Context**: Include relevant constraints or requirements
-3. **Chain Tasks**: Use multiple agents for their strengths
-4. **Verify Output**: Always review AI-generated code
-5. **Iterate**: Refine prompts based on results
+- **Be Specific**: Clear instructions help agents understand what you need
+- **Add Context**: Including constraints or requirements can improve results
+- **Chain Tasks**: Consider using multiple agents for their different strengths
+- **Verify Output**: Review AI-generated code before using it
+- **Iterate**: Refining prompts based on results often helps
 
 ## Examples
 

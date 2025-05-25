@@ -1,7 +1,7 @@
 {
   "name": "grepa",
   "version": "0.1.0",
-  "description": "Grep-anchor specification and tools for making codebases discoverable",
+  "description": "Grep-anchor specification for making codebases discoverable",
   "keywords": [
     "grep",
     "grep-anchors",
@@ -24,8 +24,6 @@
   "author": "Matt Galligan",
   "type": "module",
   "scripts": {
-    "inventory": "node scripts/inventory.js",
-    "inventory:py": "python3 scripts/inventory.py",
     "test": "pnpm -r test",
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",

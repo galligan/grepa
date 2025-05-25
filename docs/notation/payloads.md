@@ -39,6 +39,7 @@ Structured metadata for complex information.
 ```
 
 ### Common Fields
+
 | Field | Type | Purpose |
 |-------|------|---------|
 | `type` | string | Categorization |

@@ -21,8 +21,8 @@ What if your pre-commit hooks could enforce semantic patterns?
   hooks:
     - id: grepa-security-gate
       name: Security markers required
-      entry: scripts/check-security-markers.sh
-      language: script
+      entry: rg -l ":ga:sec" | xargs -I {} test -f {} || exit 1
+      language: system
       files: '(auth|payment|admin).*\.(js|py|go)'
 ```
 

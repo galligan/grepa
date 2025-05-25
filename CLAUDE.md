@@ -90,10 +90,6 @@ rg -B2 -A2 ":ga:sec" | rg ":ga:(sec|todo)"
 # Find in markdown (including HTML comments)
 rg "<!-- :ga:" --type md
 
-# Generate inventory (with options)
-scripts/inventory.js              # Default: scan all files
-scripts/inventory.js --ignore-md  # Ignore markdown files
-scripts/inventory.js --ignore-examples  # Ignore code examples
 ```
 
 ## Current Repository Structure
@@ -113,8 +109,7 @@ grepa/
 │   ├── guides/          # User guides and tutorials
 │   │   ├── quick-start.md         # 5-minute intro
 │   │   ├── progressive-enhancement.md  # Adoption levels
-│   │   ├── custom-anchors.md      # Custom sigils
-│   │   └── scripting.md           # Automation tools
+│   │   └── custom-anchors.md      # Custom sigils
 │   ├── notation/        # Technical format spec
 │   │   ├── README.md    # Notation overview
 │   │   ├── format.md    # Syntax specification
@@ -125,9 +120,6 @@ grepa/
 │   ├── examples.md      # Real-world usage
 │   ├── advanced-patterns.md  # Complex scenarios
 │   └── what-ifs.md      # AI-native vision
-├── scripts/             # Automation scripts
-│   ├── inventory.js     # Inventory generator (Node.js)
-│   └── inventory.py     # Inventory generator (Python)
 ├── README.md            # Main documentation with links
 ├── CLAUDE.md            # AI agent instructions (this file)
 └── llms.txt             # LLM-readable quick reference
@@ -162,7 +154,7 @@ When working on this project:
 2. Work on feature branches off main
 3. Use grep-anchors as comments in any new code or when you find code that doesn't yet have them
 4. Focus on simplicity and grep-ability
-5. Run inventory tool before commits to check anchor health
+5. Use ripgrep to verify anchor patterns before commits
 
 ### Documentation Standards
 - All markdown files should have `<!-- :ga:tldr -->` at the top

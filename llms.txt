@@ -221,20 +221,6 @@ fi
 ### CI/CD
 Check for critical issues in pull requests.
 
-### inventory tool
-```bash
-# Generate inventory of all anchors
-scripts/inventory.py
-
-# Ignore markdown files  
-scripts/inventory.py --ignore md
-
-# Ignore code examples in markdown
-scripts/inventory.py --ignore-examples
-
-# Use custom config
-scripts/inventory.py --config myconfig.json
-```
 
 ## Grammar
 
@@ -252,7 +238,6 @@ bare    ::= "@"? [A-Za-z0-9_.-]+
 - [Examples](https://github.com/galligan/grepa/blob/main/docs/examples.md): Real-world patterns
 - [Custom Anchors](https://github.com/galligan/grepa/blob/main/docs/guides/custom-anchors.md): Define your own
 - [Progressive Guide](https://github.com/galligan/grepa/blob/main/docs/guides/progressive-enhancement.md): Adoption path
-- [Scripting](https://github.com/galligan/grepa/blob/main/docs/guides/scripting.md): Automation with inventory tool
 
 ## Quick Reference
 

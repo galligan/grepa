@@ -165,15 +165,15 @@ Define your own structured formats:
 // :ga:compliance({"standard":"SOC2","control":"AC-2","status":"implemented"})
 ```
 
-## Best Practices for Advanced Usage
+## Working with Advanced Patterns
 
-1. **Document your schema**: If using complex JSON, document the expected fields
-2. **Validate consistently**: Consider tooling to validate JSON payloads
-3. **Don't over-engineer**: Start simple, add complexity only when needed
-4. **Keep it searchable**: Ensure your patterns are still greppable
-5. **Version your formats**: If schemas evolve, version them explicitly
+- **Document your schema**: If using complex JSON, documenting expected fields helps
+- **Validate consistently**: Consider tooling to validate JSON payloads
+- **Start simple**: Add complexity only when it provides clear value
+- **Keep it searchable**: Ensure your patterns remain greppable
+- **Version your formats**: If schemas evolve, consider versioning them
 
-Remember: Advanced patterns are powerful but optional. Most use cases are well-served by simple tags.
+Advanced patterns are powerful but optional. Most use cases work well with simple tags.
 
 ## Monorepo Patterns
 
@@ -224,4 +224,4 @@ rg ":ga:.*breaking"
 // :ga:@shared/types,breaking interface change
 ```
 
-**Note**: Resist the temptation to use different anchors (`:auth:`, `:payment:`) for different services. One anchor with tags is much more searchable and maintainable.
+**Note**: Consider using one anchor pattern with tags (`:ga:auth`, `:ga:payment`) rather than different anchors for different services. This approach tends to be more searchable and maintainable.

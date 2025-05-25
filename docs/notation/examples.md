@@ -141,7 +141,7 @@ Pure notation examples showing the format in various contexts.
 
 ## Complex Examples
 
-### Multi-part Metadata (avoid long lines)
+### Multipart Metadata (avoid long lines)
 ```javascript
 // Instead of:
 // :ga:bug,p0,@alice,{"blocker":true,"sprint":"2025-Q1"}

@@ -49,7 +49,7 @@ Patterns for code review, deployment, and team processes.
 
 ## Adoption Path
 
-```
+```text
 Level 0: Try one pattern (:ga:todo)
    ↓
 Level 1: Enhance existing TODOs (TODO :ga:)
