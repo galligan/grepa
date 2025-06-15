@@ -1,4 +1,4 @@
-// :M: tldr Custom ESLint rule to enforce Result pattern usage
+// ::: tldr Custom ESLint rule to enforce Result pattern usage
 module.exports = {
   meta: {
     type: 'problem',
@@ -18,11 +18,11 @@ module.exports = {
   },
 
   create(context) {
-    // :M: ctx track Result-returning functions
+    // ::: ctx track Result-returning functions
     const resultReturningFunctions = new Set();
 
     return {
-      // :M: api detect functions that return Result type
+      // ::: api detect functions that return Result type
       FunctionDeclaration(node) {
         if (node.returnType?.typeAnnotation) {
           const typeString = context.getSourceCode().getText(node.returnType.typeAnnotation);
@@ -32,7 +32,7 @@ module.exports = {
         }
       },
 
-      // :M: api detect arrow functions that return Result
+      // ::: api detect arrow functions that return Result
       ArrowFunctionExpression(node) {
         if (node.returnType?.typeAnnotation) {
           const typeString = context.getSourceCode().getText(node.returnType.typeAnnotation);
@@ -42,7 +42,7 @@ module.exports = {
         }
       },
 
-      // :M: api check for throw statements in Result-returning functions
+      // ::: api check for throw statements in Result-returning functions
       ThrowStatement(node) {
         const func = context.getAncestors().reverse().find(
           ancestor => resultReturningFunctions.has(ancestor)
@@ -56,7 +56,7 @@ module.exports = {
         }
       },
 
-      // :M: api check for try-catch in async functions
+      // ::: api check for try-catch in async functions
       TryStatement(node) {
         const func = context.getAncestors().reverse().find(
           ancestor => ancestor.type === 'FunctionDeclaration' || 
@@ -71,7 +71,7 @@ module.exports = {
         }
       },
 
-      // :M: api check for direct toast.error calls
+      // ::: api check for direct toast.error calls
       CallExpression(node) {
         if (
           node.callee.type === 'MemberExpression' &&
@@ -84,7 +84,7 @@ module.exports = {
           });
         }
 
-        // :M: ctx check for unchecked Result objects
+        // ::: ctx check for unchecked Result objects
         if (node.callee.type === 'Identifier') {
           const parent = node.parent;
           if (
@@ -92,7 +92,7 @@ module.exports = {
             parent.type === 'VariableDeclarator' &&
             node.callee.name.match(/^(parse|search|fetch|tryAsync)/)
           ) {
-            // :M: ctx look for subsequent if (!result.ok) check
+            // ::: ctx look for subsequent if (!result.ok) check
             const block = context.getAncestors().reverse().find(
               ancestor => ancestor.type === 'BlockStatement'
             );

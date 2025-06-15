@@ -1,4 +1,4 @@
-// :M: tldr Tests for formatter implementations
+// ::: tldr Tests for formatter implementations
 import { describe, it, expect } from 'vitest';
 import type { Waymark, SearchResult, ParseResult } from '@waymark/types';
 import {
@@ -17,7 +17,7 @@ import {
 const mockWaymark: Waymark = {
   line: 42,
   column: 1,
-  raw: '// :M: todo, api implement authentication',
+  raw: '// ::: todo, api implement authentication',
   contexts: ['todo', 'api'],
   prose: 'implement authentication',
   file: 'src/auth.ts',

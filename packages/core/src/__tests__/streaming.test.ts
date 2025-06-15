@@ -1,4 +1,4 @@
-// :M: tldr Tests for large file streaming functionality
+// ::: tldr Tests for large file streaming functionality
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { writeFileSync, unlinkSync, existsSync, mkdirSync, rmSync } from 'fs';
 import { WaymarkSearch } from '../search/waymark-search.js';
@@ -8,32 +8,32 @@ describe('Large File Streaming', () => {
   const largeTestFile = `${testDir}/large-test-file.ts`;
   
   beforeAll(() => {
-    // :M: ctx create test directory
+    // ::: ctx create test directory
     if (!existsSync(testDir)) {
       mkdirSync(testDir, { recursive: true });
     }
     
-    // :M: ctx create a large test file with anchors
-    let content = '// :M: tldr Large test file for streaming\n';
+    // ::: ctx create a large test file with anchors
+    let content = '// ::: tldr Large test file for streaming\n';
     
     // Add 100,000 lines to make it large enough to trigger streaming
     for (let i = 0; i < 100000; i++) {
       if (i % 5000 === 0) {
-        content += `// :M: security check security validation at line ${i}\n`;
+        content += `// ::: security check security validation at line ${i}\n`;
       } else if (i % 1000 === 0) {
-        content += `// :M: milestone line ${i}\n`;
+        content += `// ::: milestone line ${i}\n`;
       } else {
         content += `const line${i} = "content for line ${i}";\n`;
       }
     }
     
-    content += '// :M: performance end of large file\n';
+    content += '// ::: performance end of large file\n';
     
     writeFileSync(largeTestFile, content);
   });
 
   afterAll(() => {
-    // :M: ctx cleanup test files
+    // ::: ctx cleanup test files
     if (existsSync(largeTestFile)) unlinkSync(largeTestFile);
     if (existsSync(testDir)) rmSync(testDir, { recursive: true, force: true });
   });
@@ -50,7 +50,7 @@ describe('Large File Streaming', () => {
     if (result.ok) {
       expect(result.data.length).toBeGreaterThan(0);
       
-      // :M: ctx verify we found the milestone anchors
+      // ::: ctx verify we found the milestone anchors
       const milestones = result.data.filter(r => 
         r.anchor.contexts.includes('milestone')
       );
@@ -76,7 +76,7 @@ describe('Large File Streaming', () => {
   });
 
   it('should parse simple payloads correctly in streaming', () => {
-    // :M: ctx test the simple payload parser used in streaming
+    // ::: ctx test the simple payload parser used in streaming
     const testCases = [
       { payload: 'todo implement feature', expected: { contexts: ['todo'], prose: 'implement feature' } },
       { payload: 'security, todo validate inputs', expected: { contexts: ['security', 'todo'], prose: 'validate inputs' } },
@@ -95,7 +95,7 @@ describe('Large File Streaming', () => {
   });
 
   it('should maintain memory efficiency with large files', async () => {
-    // :M: perf test memory usage doesn't explode with large files
+    // ::: perf test memory usage doesn't explode with large files
     // Force garbage collection if available for more reliable baseline
     if (global.gc) {
       global.gc();
@@ -145,10 +145,10 @@ describe('Large File Streaming', () => {
     // Create a second large file for concurrent processing test
     const largeTestFile2 = `${testDir}/large-test-file-2.ts`;
     
-    let content = '// :M: tldr Second large test file\n';
+    let content = '// ::: tldr Second large test file\n';
     for (let i = 0; i < 50000; i++) {
       if (i % 2000 === 0) {
-        content += `// :M: concurrent processing line ${i}\n`;
+        content += `// ::: concurrent processing line ${i}\n`;
       } else {
         content += `const secondFile${i} = "content ${i}";\n`;
       }
@@ -174,7 +174,7 @@ describe('Large File Streaming', () => {
   });
 
   it('should respect context buffer limits in streaming', () => {
-    // :M: ctx test context buffer management
+    // ::: ctx test context buffer management
     const contextSize = 5;
     const maxBufferSize = contextSize * 2 + 1;
     const buffer: string[] = [];
@@ -192,17 +192,17 @@ describe('Large File Streaming', () => {
   });
 
   it('should validate anchor format in streaming mode', () => {
-    // :M: sec test anchor validation during streaming
+    // ::: sec test anchor validation during streaming
     const testLines = [
-      '// :M: valid anchor',
-      '// :M:invalid no space',
-      '// :M: ',
-      '// :M: multiple, contexts test',
+      '// ::: valid anchor',
+      '// :::invalid no space',
+      '// ::: ',
+      '// ::: multiple, contexts test',
       'no anchor here'
     ];
 
     const validAnchors = testLines.filter(line => {
-      const anchorIndex = line.indexOf(':M:');
+      const anchorIndex = line.indexOf(':::');
       if (anchorIndex === -1) return false;
       
       const afterAnchor = line.substring(anchorIndex + 3);

@@ -41,7 +41,7 @@ A **waymark** is a small, consistent marker that helps make comments more discov
 ```javascript
 // todo ::: add input validation
 function processPayment(amount) {
-    // warn ::: verify amount is positive #security
+    // alert ::: verify amount is positive +security
     chargeCard(amount);
 }
 ```
@@ -50,7 +50,7 @@ Search examples:
 
 ```bash
 rg ":::"          # List all waymarks
-rg "warn :::"     # Jump to warnings
+rg "alert :::"    # Jump to alerts
 rg "todo :::"     # Find all tasks
 ```
 
@@ -133,17 +133,17 @@ waymark list src/ --contexts
   ```go
   // ::: user_ids are always UUIDs, never integers
   func GetUser(userID string) (*User, error) {
-      // warn ::: validate UUID format to prevent injection #security
+      // alert ::: validate UUID format to prevent injection +security
       return db.FindUser(userID)
   }
   ```
 
-### 4. Use Properties and Hashtags
+### 4. Use Properties and Tags
 
 - Add structured data and classification
   ```typescript
-  // todo ::: priority:high fix rate limiting #performance
-  // temp ::: deprecated:v3.0 remove after Redis upgrade
+  // todo ::: priority:high fix rate limiting +performance
+  // temp ::: remove after Redis upgrade
   ```
 
 ## 🎯 Core Patterns
@@ -154,7 +154,7 @@ waymark list src/ --contexts
 | `todo :::` | Work to be done | `// todo ::: add error handling` |
 | `:::` | Important context (pure note) | `// ::: expects UTC timestamps` |
 | `@mentions` | AI agent tasks | `// todo ::: @agent implement this function` |
-| `warn :::` | Security/safety concerns | `// warn ::: validate all inputs #security` |
+| `alert :::` | Security/safety concerns | `// alert ::: validate all inputs +security` |
 | `temp :::` | Temporary code | `// temp ::: remove after v2.0` |
 
 ## 📈 Getting Started
@@ -164,11 +164,11 @@ Start simple and add complexity as needed:
 ```javascript
 // Basic waymarks
 // todo ::: implement caching
-// warn ::: sanitize user input #security
+// alert ::: sanitize user input +security
 
 // Add properties and hashtags when helpful
 // todo ::: fixes:#42 fix memory leak
-// todo ::: assign:@alice payment integration #backend
+// todo ::: @alice payment integration #backend
 ```
 
 ## 🤖 Example AI Agent Workflow
@@ -180,8 +180,8 @@ class UserService:
     # ::: all users must have unique emails
     def create_user(self, email: str, name: str):
         # todo ::: @agent implement with proper validation
-        # warn ::: prevent duplicate emails #security
-        # todo ::: add rate limiting #performance
+        # alert ::: prevent duplicate emails +security
+        # todo ::: add rate limiting +performance
         pass
 ```
 
@@ -197,7 +197,7 @@ user_service.py:4: # todo ::: @agent implement with proper validation
 ```bash
 $ rg ":::" user_service.py
 user_service.py:2: # ::: all users must have unique emails
-user_service.py:5: # warn ::: prevent duplicate emails #security
+user_service.py:5: # alert ::: prevent duplicate emails +security
 ```
 
 ### 4. AI implements with full understanding:
@@ -241,14 +241,14 @@ def create_user(self, email: str, name: str):
 **Core prefixes:**
 - `todo :::` - Work to be done
 - `fix :::` - Bugs to fix  
-- `warn :::` - Warnings and cautions
+- `alert :::` - Warnings and cautions
 - `temp :::` - Temporary code
 - `tldr :::` - Brief summaries
 - `:::` - Pure notes (no prefix)
 
 **With properties and hashtags:**
 - `todo ::: fixes:#123 implement auth` - Link to issue
-- `todo ::: assign:@alice payment flow` - Assign ownership
+- `todo ::: @alice payment flow` - Assign ownership
 - `todo ::: priority:high fix memory leak #critical` - Set priority
 
 See [Conventions](docs/conventions.md) for complete patterns.
@@ -276,11 +276,11 @@ rg ":::"
 
 # Find by prefix
 rg "todo :::"
-rg "warn :::"
+rg "alert :::"
 rg "fix :::"
 
 # Find with context (lines before/after)
-rg -B1 -A1 "warn :::"  # 1 line before and after
+rg -B1 -A1 "alert :::"  # 1 line before and after
 rg -C2 "todo :::"      # 2 lines context
 
 # Find by hashtag

@@ -1,4 +1,4 @@
-// :M: tldr Main CLI implementation using Commander.js
+// ::: tldr Main CLI implementation using Commander.js
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { readFile } from 'fs/promises';
@@ -6,7 +6,8 @@ import { existsSync } from 'fs';
 import { isAbsolute, resolve } from 'path';
 import { 
   WaymarkParser, 
-  WaymarkSearch, 
+  WaymarkSearch,
+  WaymarkLinter, 
   success, 
   failure, 
   makeError, 
@@ -20,7 +21,7 @@ import {
 import type { Result, AppError } from '@waymark/core';
 import { FormatterFactory } from '@waymark/formatters';
 
-// :M: sec rate limiting configuration
+// ::: sec rate limiting configuration
 interface RateLimitConfig {
   maxRequests: number;
   windowMs: number;
@@ -56,14 +57,14 @@ export class CLI {
     this.setupCommands();
   }
 
-  // :M: api configure CLI commands and options
+  // ::: api configure CLI commands and options
   private setupCommands(): void {
     this.program
       .name('waymark')
       .description('Waymark parser and search tool')
       .version('0.2.0');
 
-    // :M: api parse command to analyze files for anchors
+    // ::: api parse command to analyze files for waymarks
     this.program
       .command('parse')
       .description('Parse file(s) for waymarks')
@@ -76,7 +77,7 @@ export class CLI {
         this.handleCommandResult(result);
       });
 
-    // :M: api search command to find specific anchors
+    // ::: api search command to find specific waymarks
     this.program
       .command('search')
       .description('Search for waymarks by context')
@@ -92,7 +93,7 @@ export class CLI {
         this.handleCommandResult(result);
       });
 
-    // :M: api list command to show all anchors
+    // ::: api list command to show all waymarks
     this.program
       .command('list')
       .description('List all waymarks in file(s)')
@@ -106,9 +107,22 @@ export class CLI {
         const result = await this.listCommand(patterns, options);
         this.handleCommandResult(result);
       });
+
+    // ::: api lint command to validate and migrate waymark syntax
+    this.program
+      .command('lint')
+      .description('Lint files for waymark syntax issues')
+      .argument('[patterns...]', 'File patterns to lint (default: current directory)')
+      .option('-f, --fix', 'Auto-fix issues (migrate old syntax to v1.0)')
+      .option('--no-gitignore', 'Do not respect .gitignore files')
+      .option('--exclude <patterns...>', 'Patterns to exclude')
+      .action(async (patterns: string[], options) => {
+        const result = await this.lintCommand(patterns, options);
+        this.handleCommandResult(result);
+      });
   }
 
-  // :M: api main CLI entry point
+  // ::: api main CLI entry point
   async run(): Promise<void> {
     try {
       await this.program.parseAsync();
@@ -122,7 +136,7 @@ export class CLI {
     }
   }
 
-  // :M: api handle command result with proper error display
+  // ::: api handle command result with proper error display
   private handleCommandResult<T>(result: Result<T>): void {
     if (!result.ok) {
       console.error(chalk.red(`Error: ${humanise(result.error)}`));
@@ -147,7 +161,7 @@ export class CLI {
    * }
    * ```
    */
-  // :M: sec check rate limit for operations
+  // ::: sec check rate limit for operations
   private checkRateLimit(operation: string): Result<void> {
     const now = Date.now();
     const key = `${operation}-${process.cwd()}`;
@@ -189,13 +203,13 @@ export class CLI {
    * // Returns error for /etc/passwd (outside working directory)
    * ```
    */
-  // :M: api validate file paths for security
+  // ::: api validate file paths for security
   private async validateFilePaths(files: string[]): Promise<Result<string[]>> {
     const validatedPaths: string[] = [];
     const cwd = process.cwd();
     
     for (const file of files) {
-      // :M: sec validate file path format
+      // ::: sec validate file path format
       const validation = filePathSchema.safeParse(file);
       if (!validation.success) {
         return failure(makeError(
@@ -204,13 +218,13 @@ export class CLI {
         ));
       }
       
-      // :M: sec prevent directory traversal attacks
+      // ::: sec prevent directory traversal attacks
       const absolutePath = isAbsolute(file) ? file : resolve(cwd, file);
       const normalizedPath = resolve(absolutePath);
       
-      // :M: critical remove the vulnerability that allowed any absolute path starting with '/'
+      // ::: critical remove the vulnerability that allowed any absolute path starting with '/'
       // Only allow paths within the current working directory
-      // :M: sec handle Windows case-insensitive drive letters
+      // ::: sec handle Windows case-insensitive drive letters
       const withinCwd = process.platform === 'win32'
         ? normalizedPath.toLowerCase().startsWith(cwd.toLowerCase())
         : normalizedPath.startsWith(cwd);
@@ -222,7 +236,7 @@ export class CLI {
         ));
       }
       
-      // :M: sec resolve symlinks to prevent bypass attacks
+      // ::: sec resolve symlinks to prevent bypass attacks
       try {
         // Check if file exists before trying to resolve real path
         if (existsSync(normalizedPath)) {
@@ -252,9 +266,9 @@ export class CLI {
     return success(validatedPaths);
   }
 
-  // :M: sec validate file content for security threats
+  // ::: sec validate file content for security threats
   private validateFileContent(content: string, filename: string): Result<void> {
-    // :M: sec check for null bytes (common attack vector)
+    // ::: sec check for null bytes (common attack vector)
     if (content.includes('\0')) {
       return failure(makeError(
         'security.maliciousContent',
@@ -262,7 +276,7 @@ export class CLI {
       ));
     }
 
-    // :M: sec check for excessive file size in memory
+    // ::: sec check for excessive file size in memory
     const contentSize = Buffer.byteLength(content, 'utf8');
     if (contentSize > 50 * 1024 * 1024) { // 50MB limit for in-memory processing
       return failure(makeError(
@@ -271,7 +285,7 @@ export class CLI {
       ));
     }
 
-    // :M: sec check for suspicious patterns (no global flag to avoid state issues)
+    // ::: sec check for suspicious patterns (no global flag to avoid state issues)
     const suspiciousPatterns = [
       /eval\s*\(/i,                    // eval() calls
       /Function\s*\(/i,                // Function constructor
@@ -284,7 +298,7 @@ export class CLI {
 
     for (const pattern of suspiciousPatterns) {
       if (pattern.test(content)) {
-        // :M: ctx log suspicious content for audit
+        // ::: ctx log suspicious content for audit
         if (process.env['WAYMARK_SECURITY_LOG'] === 'true') {
           console.warn(chalk.yellow(`Security warning: Suspicious pattern detected in ${filename}`));
         }
@@ -295,18 +309,18 @@ export class CLI {
     return success(undefined);
   }
 
-  // :M: api handle parse command with Result pattern
+  // ::: api handle parse command with Result pattern
   private async parseCommand(
     files: string[],
     options: unknown
   ): Promise<Result<void>> {
-    // :M: sec check rate limit
+    // ::: sec check rate limit
     const rateLimitCheck = this.checkRateLimit('parse');
     if (!rateLimitCheck.ok) {
       return rateLimitCheck;
     }
 
-    // :M: ctx validate options
+    // ::: ctx validate options
     const optionsValidation = parseCommandOptionsSchema.safeParse(options);
     if (!optionsValidation.success) {
       return failure(fromZod(optionsValidation.error));
@@ -314,7 +328,7 @@ export class CLI {
 
     const validOptions = optionsValidation.data;
 
-    // :M: ctx validate file paths
+    // ::: ctx validate file paths
     const pathValidation = await this.validateFilePaths(files);
     if (!pathValidation.ok) {
       return pathValidation;
@@ -331,10 +345,10 @@ export class CLI {
       }
 
       try {
-        // :M: ctx use async file reading
+        // ::: ctx use async file reading
         const content = await readFile(file, 'utf-8');
         
-        // :M: sec validate content before processing
+        // ::: sec validate content before processing
         const contentValidation = this.validateFileContent(content, file);
         if (!contentValidation.ok) {
           errors.push(contentValidation.error);
@@ -379,19 +393,19 @@ export class CLI {
     return success(undefined);
   }
 
-  // :M: api handle search command with Result pattern
+  // ::: api handle search command with Result pattern
   private async searchCommand(
     context: string,
     patterns: string[],
     options: Record<string, unknown>
   ): Promise<Result<void>> {
-    // :M: sec check rate limit
+    // ::: sec check rate limit
     const rateLimitCheck = this.checkRateLimit('search');
     if (!rateLimitCheck.ok) {
       return rateLimitCheck;
     }
 
-    // :M: ctx validate options
+    // ::: ctx validate options
     const optionsValidation = searchCommandOptionsSchema.safeParse(options);
     if (!optionsValidation.success) {
       return failure(fromZod(optionsValidation.error));
@@ -399,15 +413,15 @@ export class CLI {
 
     const validOptions = optionsValidation.data;
     
-    // :M: ctx validate context
+    // ::: ctx validate marker
     if (!context || context.trim().length === 0) {
       return failure(makeError(
         'cli.missingArgument',
-        'Context cannot be empty'
+        'Marker cannot be empty'
       ));
     }
 
-    // :M: ctx use current directory if no patterns specified
+    // ::: ctx use current directory if no patterns specified
     const searchPatterns = patterns.length > 0 ? patterns : ['./**/*'];
     
     const searchOptions = {
@@ -420,7 +434,7 @@ export class CLI {
       exclude: (options['exclude'] as string[] | undefined) || []
     };
 
-    // :M: ctx use new async search method
+    // ::: ctx use new async search method
     const searchResult = await WaymarkSearch.search(searchPatterns, searchOptions);
     if (!searchResult.ok) {
       return searchResult;
@@ -442,18 +456,18 @@ export class CLI {
     return success(undefined);
   }
 
-  // :M: api handle list command with Result pattern
+  // ::: api handle list command with Result pattern
   private async listCommand(
     patterns: string[],
     options: Record<string, unknown>
   ): Promise<Result<void>> {
-    // :M: sec check rate limit
+    // ::: sec check rate limit
     const rateLimitCheck = this.checkRateLimit('list');
     if (!rateLimitCheck.ok) {
       return rateLimitCheck;
     }
 
-    // :M: ctx validate options
+    // ::: ctx validate options
     const optionsValidation = listCommandOptionsSchema.safeParse(options);
     if (!optionsValidation.success) {
       return failure(fromZod(optionsValidation.error));
@@ -461,10 +475,10 @@ export class CLI {
 
     const validOptions = optionsValidation.data;
 
-    // :M: ctx use current directory if no patterns specified
+    // ::: ctx use current directory if no patterns specified
     const searchPatterns = patterns.length > 0 ? patterns : ['./**/*'];
 
-    // :M: ctx search for all anchors
+    // ::: ctx search for all waymarks
     const searchResult = await WaymarkSearch.search(searchPatterns, {
       respectGitignore: validOptions.gitignore !== false,
       exclude: (options['exclude'] as string[] | undefined) || []
@@ -483,7 +497,7 @@ export class CLI {
     );
     
     if (validOptions.contexts) {
-      // :M: ctx show only unique contexts
+      // ::: ctx show only unique markers
       const uniqueContexts = WaymarkSearch.getUniqueContexts(searchResult.data);
       const output = formatter.format({
         type: 'contexts',
@@ -496,6 +510,110 @@ export class CLI {
         data: searchResult.data
       });
       console.log(output);
+    }
+
+    return success(undefined);
+  }
+
+  // ::: api handle lint command with Result pattern
+  private async lintCommand(
+    patterns: string[],
+    options: Record<string, unknown>
+  ): Promise<Result<void>> {
+    // ::: sec check rate limit
+    const rateLimitCheck = this.checkRateLimit('lint');
+    if (!rateLimitCheck.ok) {
+      return rateLimitCheck;
+    }
+
+    // ::: ctx use current directory if no patterns specified
+    const searchPatterns = patterns.length > 0 ? patterns : ['./**/*'];
+
+    // ::: ctx resolve files to lint
+    const searchOptions = {
+      respectGitignore: options['gitignore'] !== false,
+      exclude: (options['exclude'] as string[] | undefined) || []
+    };
+
+    // ::: ctx use globby to resolve files
+    const { globby } = await import('globby');
+    const globOptions = {
+      absolute: true,
+      onlyFiles: true,
+      dot: false,
+      gitignore: searchOptions.respectGitignore !== false,
+      ignore: [
+        '**/node_modules/**',
+        '**/.git/**',
+        ...(searchOptions.exclude || [])
+      ]
+    };
+
+    const files = await globby(searchPatterns, globOptions);
+    const filteredFiles = files.filter((file: string) => {
+      const ext = file.substring(file.lastIndexOf('.')).toLowerCase();
+      return ['.ts', '.js', '.jsx', '.tsx', '.md', '.txt', '.py', '.java', '.c', '.cpp', '.h', '.go', '.rs', '.rb', '.php', '.swift', '.kt', '.scala'].includes(ext);
+    });
+
+    if (filteredFiles.length === 0) {
+      return failure(makeError(
+        'search.noResults',
+        'No files found matching the specified patterns'
+      ));
+    }
+
+    const filesResult = { ok: true as const, data: filteredFiles };
+
+    let totalIssues = 0;
+    let totalFixed = 0;
+    let filesWithIssues = 0;
+
+    // ::: ctx lint each file
+    for (const file of filesResult.data) {
+      const lintResult = await WaymarkLinter.lintFile(file, options['fix'] === true);
+      
+      if (!lintResult.ok) {
+        console.error(chalk.red(`Error linting ${file}: ${lintResult.error.message}`));
+        continue;
+      }
+
+      if (lintResult.data.issues.length > 0) {
+        filesWithIssues++;
+        totalIssues += lintResult.data.issues.length;
+        
+        if (lintResult.data.fixedCount) {
+          totalFixed += lintResult.data.fixedCount;
+        }
+
+        // ::: ctx display issues
+        console.log(chalk.bold(`\n${file}:`));
+        for (const issue of lintResult.data.issues) {
+          const color = issue.type === 'error' ? chalk.red : issue.type === 'warning' ? chalk.yellow : chalk.blue;
+          console.log(`  ${color(`${issue.line}:${issue.column}`)} ${issue.message}`);
+          if (issue.fix && !options['fix']) {
+            console.log(chalk.gray(`    Suggested fix: Replace "${issue.fix.old}" with "${issue.fix.new}"`));
+          }
+        }
+      }
+    }
+
+    // ::: ctx display summary
+    console.log(chalk.bold(`\n✨ Lint Summary:`));
+    console.log(`Files checked: ${filesResult.data.length}`);
+    console.log(`Files with issues: ${filesWithIssues}`);
+    console.log(`Total issues: ${totalIssues}`);
+    
+    if (options['fix'] && totalFixed > 0) {
+      console.log(chalk.green(`Fixed: ${totalFixed} issues`));
+    } else if (totalIssues > 0 && !options['fix']) {
+      console.log(chalk.yellow(`\nTip: Use --fix to automatically fix ${totalIssues} issues`));
+    }
+
+    if (totalIssues > 0 && totalFixed < totalIssues) {
+      return failure(makeError(
+        'lint.hasIssues',
+        `Found ${totalIssues - totalFixed} unresolved issues`
+      ));
     }
 
     return success(undefined);

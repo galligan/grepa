@@ -1,10 +1,10 @@
-// :M: tldr Unified terminal formatter with color support
+// ::: tldr Unified terminal formatter with color support
 import chalk from 'chalk';
 import type { IFormatter, FormatterInput } from '../interfaces/unified-formatter.interface.js';
 import type { SearchResult, Waymark } from '@waymark/types';
 
 export class TerminalFormatter implements IFormatter {
-  // :M: api format data for terminal display
+  // ::: api format data for terminal display
   format(input: FormatterInput): string {
     switch (input.type) {
       case 'search':
@@ -20,7 +20,7 @@ export class TerminalFormatter implements IFormatter {
     }
   }
 
-  // :M: api format search results for terminal
+  // ::: api format search results for terminal
   private formatSearchResults(results: SearchResult[]): string {
     if (results.length === 0) {
       return chalk.yellow('No anchors found');
@@ -29,7 +29,7 @@ export class TerminalFormatter implements IFormatter {
     const output: string[] = [];
     output.push(chalk.green(`Found ${results.length} anchor(s):\n`));
 
-    // :M: ctx group by file
+    // ::: ctx group by file
     const byFile = new Map<string, SearchResult[]>();
     for (const result of results) {
       const file = result.anchor.file || 'unknown';
@@ -39,7 +39,7 @@ export class TerminalFormatter implements IFormatter {
       byFile.get(file)!.push(result);
     }
 
-    // :M: ctx display each file
+    // ::: ctx display each file
     for (const [file, fileResults] of byFile) {
       output.push(chalk.blue(file));
       for (const result of fileResults) {
@@ -54,13 +54,13 @@ export class TerminalFormatter implements IFormatter {
     return output.join('\n');
   }
 
-  // :M: api format list results
+  // ::: api format list results
   private formatListResults(results: SearchResult[]): string {
-    // :M: ctx same format as search results
+    // ::: ctx same format as search results
     return this.formatSearchResults(results);
   }
 
-  // :M: api format parse results
+  // ::: api format parse results
   private formatParseResults(data: { file: string; result: { anchors: Waymark[]; errors: any[] } }): string {
     const output: string[] = [];
     
@@ -81,7 +81,7 @@ export class TerminalFormatter implements IFormatter {
     return output.join('\n');
   }
 
-  // :M: api format unique contexts
+  // ::: api format unique contexts
   private formatContexts(contexts: string[]): string {
     const output: string[] = [];
     output.push(chalk.green(`Found ${contexts.length} unique context(s):\n`));
@@ -93,14 +93,14 @@ export class TerminalFormatter implements IFormatter {
     return output.join('\n');
   }
 
-  // :M: api format single anchor with line and column number
+  // ::: api format single anchor with line and column number
   private formatAnchor(anchor: Waymark): string {
     const contexts = anchor.contexts.map(c => chalk.cyan(c)).join(', ');
     const prose = anchor.prose ? ` ${anchor.prose}` : '';
     return `${chalk.yellow(`${anchor.line}:${anchor.column}`)}: ${contexts}${prose}`;
   }
 
-  // :M: api format context lines
+  // ::: api format context lines
   private formatContext(result: SearchResult): string {
     const output: string[] = [];
     

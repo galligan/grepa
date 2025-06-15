@@ -1,23 +1,23 @@
-// :M: tldr Factory for creating appropriate formatters based on format type
+// ::: tldr Factory for creating appropriate formatters based on format type
 import type {
   ISearchResultFormatter,
   IWaymarkFormatter,
   IWaymarkListFormatter,
   IParseResultFormatter,
   FormatterOptions,
-} from './interfaces';
+} from './interfaces/index.js';
 import {
   JsonSearchResultFormatter,
   JsonWaymarkFormatter,
   JsonWaymarkListFormatter,
   JsonParseResultFormatter,
-} from './formatters/json.formatter';
+} from './formatters/json.formatter.js';
 import {
   TerminalSearchResultFormatter,
   TerminalWaymarkFormatter,
   TerminalParseResultFormatter,
   TerminalWaymarkListFormatter,
-} from './formatters/terminal.formatter';
+} from './formatters/terminal.formatter.js';
 
 export type FormatType = 'json' | 'terminal';
 

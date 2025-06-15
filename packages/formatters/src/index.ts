@@ -1,15 +1,15 @@
-// :M: tldr Main entry point for @waymark/formatters package
-export * from './interfaces';
-export * from './formatter-factory';
-export * from './formatters/json.formatter';
-export * from './formatters/terminal.formatter';
+// ::: tldr Main entry point for @waymark/formatters package
+export * from './interfaces/index.js';
+export * from './formatter-factory.js';
+export * from './formatters/json.formatter.js';
+export * from './formatters/terminal.formatter.js';
 
-// :M: api unified formatter exports
+// ::: api unified formatter exports
 export { 
   type IFormatter as IUnifiedFormatter, 
   type FormatterInput 
-} from './interfaces/unified-formatter.interface';
-export { FormatterFactory } from './unified-formatter-factory';
-export { TerminalFormatter } from './formatters/unified-terminal.formatter';
-export { JsonFormatter } from './formatters/unified-json.formatter';
-export { CSVFormatter } from './formatters/csv.formatter';
+} from './interfaces/unified-formatter.interface.js';
+export { FormatterFactory } from './unified-formatter-factory.js';
+export { TerminalFormatter } from './formatters/unified-terminal.formatter.js';
+export { JsonFormatter } from './formatters/unified-json.formatter.js';
+export { CSVFormatter } from './formatters/csv.formatter.js';

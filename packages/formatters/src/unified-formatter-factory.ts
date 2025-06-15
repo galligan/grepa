@@ -1,4 +1,4 @@
-// :M: tldr Factory for creating unified formatters
+// ::: tldr Factory for creating unified formatters
 import type { IFormatter } from './interfaces/unified-formatter.interface.js';
 import { TerminalFormatter } from './formatters/unified-terminal.formatter.js';
 import { JsonFormatter } from './formatters/unified-json.formatter.js';
@@ -20,7 +20,7 @@ export type UnifiedFormatType = 'terminal' | 'json' | 'csv';
  * const csvFormatter = createFormatter('csv');
  * ```
  */
-// :M: api create formatter based on type
+// ::: api create formatter based on type
 export function createFormatter(format: UnifiedFormatType = 'terminal'): IFormatter {
   switch (format) {
     case 'terminal':
@@ -34,7 +34,7 @@ export function createFormatter(format: UnifiedFormatType = 'terminal'): IFormat
   }
 }
 
-// :M: api backward compatibility export
+// ::: api backward compatibility export
 export const FormatterFactory = {
   create: createFormatter
 };

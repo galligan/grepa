@@ -1,4 +1,4 @@
-// :M: tldr Terminal formatters with color support for human-readable output
+// ::: tldr Terminal formatters with color support for human-readable output
 import chalk from 'chalk';
 import type { SearchResult, ParseResult, Waymark } from '@waymark/types';
 import type {
@@ -23,19 +23,19 @@ export class TerminalSearchResultFormatter implements ISearchResultFormatter {
       output.push(this.formatWaymark(result.anchor));
       
       if (this.options.context && this.options.context > 0 && result.context !== undefined) {
-        // :M: ctx show context lines before
+        // ::: ctx show context lines before
         result.context.before.forEach((line: string, index: number) => {
           const lineNum = Math.max(1, result.anchor.line - (this.options.context ?? 0) + index);
           output.push(chalk.dim(`    ${lineNum}: ${line}`));
         });
         
-        // :M: ctx show context lines after  
+        // ::: ctx show context lines after  
         result.context.after.forEach((line: string, index: number) => {
           const lineNum = result.anchor.line + index + 1;
           output.push(chalk.dim(`    ${lineNum}: ${line}`));
         });
         
-        output.push(''); // :M: ctx blank line between results
+        output.push(''); // ::: ctx blank line between results
       }
     });
 

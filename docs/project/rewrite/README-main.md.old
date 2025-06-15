@@ -1,5 +1,0 @@
-<!-- Note: This is a partial backup of main README.md old content -->
-
-- **One command**: `rg ":M:"` shows all important contexts
-
-That mindset — pick a unique string, grep it everywhere, document the contract — is exactly what `:M:` formalizes. Think of waymarks as the portable follow-up to Codex's internal practice, distilled into a three-character identifier any OSS project or LLM can rely on.

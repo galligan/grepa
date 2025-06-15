@@ -1,15 +1,15 @@
-// :M: tldr Toast wrapper utilities for future UI integration
+// ::: tldr Toast wrapper utilities for future UI integration
 import type { Result } from './result.js';
 import type { AppError, ErrorCode } from './error.js';
 
-// :M: api Mock toast interface (replace with actual library when UI is added)
+// ::: api Mock toast interface (replace with actual library when UI is added)
 interface Toast {
   success(title: string, options?: { description?: string; duration?: number; id?: string }): void;
   error(title: string, options?: { description?: string; duration?: number; id?: string }): void;
   loading(message: string): string;
 }
 
-// :M: ctx Mock implementation for development
+// ::: ctx Mock implementation for development
 const mockToast: Toast = {
   success: (title, options) => console.log(`✅ ${title}`, options?.description || ''),
   error: (title, options) => console.error(`❌ ${title}`, options?.description || ''),
@@ -19,7 +19,7 @@ const mockToast: Toast = {
   },
 };
 
-// :M: api Use this when adding a real toast library
+// ::: api Use this when adding a real toast library
 // import { toast } from 'sonner';
 const toast = mockToast;
 
@@ -28,12 +28,12 @@ type ToastOptions = {
   duration?: number;
 };
 
-// :M: api Human-readable error messages
+// ::: api Human-readable error messages
 export function humanise(err: AppError): string {
   const messages: Record<ErrorCode, string> = {
     // Parse errors
     'parse.invalidSyntax': 'Invalid waymark syntax found',
-    'parse.missingSpace': 'Missing required space after :M: context',
+    'parse.missingSpace': 'Missing required space after ::: sigil',
     'parse.emptyPayload': 'Waymark payload cannot be empty',
     'parse.invalidContext': 'Invalid context format',
     'parse.tooManyContexts': 'Too many contexts on a single line',
@@ -71,11 +71,14 @@ export function humanise(err: AppError): string {
     'system.timeout': 'Operation timed out. Please try again',
     'network': 'Network error occurred. Please check your connection',
     'unexpected': 'An unexpected error occurred. Please try again',
+    
+    // Lint errors
+    'lint.hasIssues': 'Linting found issues that need to be resolved',
   };
 
   const message = messages[err.code];
   
-  // :M: ctx log unmapped error codes for debugging
+  // ::: ctx log unmapped error codes for debugging
   if (!message && err.code && process.env['NODE_ENV'] !== 'production') {
     console.warn(`Unmapped error code: ${err.code}`, { error: err });
   }
@@ -83,7 +86,7 @@ export function humanise(err: AppError): string {
   return message ?? err.message ?? 'An unknown error occurred';
 }
 
-// :M: api Display toast based on Result status
+// ::: api Display toast based on Result status
 export function showResultToast<T>(
   title: string,
   res: Result<T, AppError>,
@@ -105,7 +108,7 @@ export function showResultToast<T>(
   return res.ok;
 }
 
-// :M: api Wrap async operation with loading/success/error toasts
+// ::: api Wrap async operation with loading/success/error toasts
 export async function withToast<T>(
   promise: Promise<Result<T, AppError>>,
   messages: {

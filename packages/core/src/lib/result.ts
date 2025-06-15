@@ -1,4 +1,4 @@
-// :M: tldr Result pattern implementation for error handling
+// ::: tldr Result pattern implementation for error handling
 import type { AppError, ErrorCode } from './error.js';
 import { makeError } from './error.js';
 
@@ -9,7 +9,7 @@ export type Result<T, E = AppError> =
 export const success = <T>(data: T): Result<T, never> => ({ ok: true, data });
 export const failure = <E = AppError>(error: E): Result<never, E> => ({ ok: false, error });
 
-// :M: api Helper for async operations with error handling
+// ::: api Helper for async operations with error handling
 export async function tryAsync<T>(
   fn: () => Promise<T>,
   defaultErrorCode: ErrorCode = 'unexpected'
@@ -26,7 +26,7 @@ export async function tryAsync<T>(
   }
 }
 
-// :M: api Type guard for AppError
+// ::: api Type guard for AppError
 export function isAppError(error: unknown): error is AppError {
   return (
     typeof error === 'object' &&

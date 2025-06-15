@@ -1,4 +1,4 @@
-// :M: tldr Base formatter interface for all output formatters
+// ::: tldr Base formatter interface for all output formatters
 import type { SearchResult, ParseResult, Waymark } from '@waymark/types';
 
 export interface IFormatter<T> {

@@ -1,9 +1,9 @@
-// :M: tldr Zod error adapter following TypeScript conventions
+// ::: tldr Zod error adapter following TypeScript conventions
 import { ZodError } from 'zod';
 import { makeError } from './error.js';
 import type { AppError } from './error.js';
 
-// :M: api Convert Zod errors to AppError
+// ::: api Convert Zod errors to AppError
 export const fromZod = (err: ZodError): AppError => {
   const issue = err.errors[0];
   if (!issue) {
@@ -13,7 +13,7 @@ export const fromZod = (err: ZodError): AppError => {
   const field = issue.path.join('.');
   const defaultMessage = `${field ? `${field}: ` : ''}${issue.message}`;
 
-  // :M: ctx Map specific Zod issues to domain error codes
+  // ::: ctx Map specific Zod issues to domain error codes
   if (field === 'file' && issue.code === 'custom') {
     return makeError('file.notFound', issue.message || 'File not found', err);
   }

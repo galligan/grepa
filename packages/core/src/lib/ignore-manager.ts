@@ -1,4 +1,4 @@
-// :M: tldr Centralized ignore file management for waymark
+// ::: tldr Centralized ignore file management for waymark
 import { readFileSync, existsSync } from 'fs';
 import { join, relative, dirname } from 'path';
 import ignore from 'ignore';
@@ -12,10 +12,10 @@ import { assert, assertNonNull } from './type-guards.js';
  * Follows DRY principle by centralizing all ignore logic
  */
 export class IgnoreManager {
-  // :M: ctx cache ignore instances by directory
+  // ::: ctx cache ignore instances by directory
   private static cache = new Map<string, Ignore>();
   
-  // :M: ctx default patterns to always ignore
+  // ::: ctx default patterns to always ignore
   private static readonly DEFAULT_IGNORES: Readonly<string[]> = [
     'node_modules',
     '.git',
@@ -31,9 +31,9 @@ export class IgnoreManager {
   /**
    * Check if a file should be ignored based on all ignore rules
    */
-  // :M: api main entry point for ignore checking
+  // ::: api main entry point for ignore checking
   static shouldIgnore(filePath: string): Result<boolean> {
-    // :M: ctx validate input
+    // ::: ctx validate input
     try {
       assert(filePath, 'File path cannot be empty');
       assert(!filePath.includes('\0'), 'File path cannot contain null bytes');
@@ -49,14 +49,14 @@ export class IgnoreManager {
     const igResult = this.getIgnoreInstance(dir);
     
     if (!igResult.ok) {
-      // :M: ctx if we can't load ignore files, default to not ignoring
+      // ::: ctx if we can't load ignore files, default to not ignoring
       return success(false);
     }
 
     const projectRoot = this.findProjectRoot(dir);
     let relativePath = relative(projectRoot, filePath);
     
-    // :M: ctx normalize path separators to POSIX style for cross-platform compatibility
+    // ::: ctx normalize path separators to POSIX style for cross-platform compatibility
     // The ignore library expects forward slashes even on Windows
     if (process.platform === 'win32') {
       relativePath = relativePath.replace(/\\/g, '/');
@@ -68,9 +68,9 @@ export class IgnoreManager {
   /**
    * Get or create ignore instance for a directory
    */
-  // :M: api get ignore instance with caching
+  // ::: api get ignore instance with caching
   private static getIgnoreInstance(dir: string): Result<Ignore> {
-    // :M: ctx check cache first
+    // ::: ctx check cache first
     if (this.cache.has(dir)) {
       const cached = this.cache.get(dir);
       assertNonNull(cached, 'Cached ignore instance should not be null');
@@ -79,16 +79,16 @@ export class IgnoreManager {
 
     const ig = ignore();
     
-    // :M: ctx add default ignores
+    // ::: ctx add default ignores
     ig.add([...this.DEFAULT_IGNORES]);
     
-    // :M: ctx load .gitignore
+    // ::: ctx load .gitignore
     const gitignoreResult = this.loadIgnoreFile(dir, '.gitignore');
     if (gitignoreResult.ok) {
       ig.add(gitignoreResult.data);
     }
     
-    // :M: ctx load .waymarkignore (project-specific)
+    // ::: ctx load .waymarkignore (project-specific)
     const waymarkignoreResult = this.loadIgnoreFile(dir, '.waymarkignore');
     if (waymarkignoreResult.ok) {
       ig.add(waymarkignoreResult.data);
@@ -101,7 +101,7 @@ export class IgnoreManager {
   /**
    * Load ignore file content
    */
-  // :M: api load and validate ignore file
+  // ::: api load and validate ignore file
   private static loadIgnoreFile(dir: string, filename: string): Result<string> {
     const filePath = this.findIgnoreFile(dir, filename);
     if (!filePath) {
@@ -126,7 +126,7 @@ export class IgnoreManager {
   /**
    * Find ignore file by traversing up directory tree
    */
-  // :M: api find ignore file in directory hierarchy
+  // ::: api find ignore file in directory hierarchy
   private static findIgnoreFile(startDir: string, filename: string): string | null {
     let currentDir = startDir;
     
@@ -144,7 +144,7 @@ export class IgnoreManager {
   /**
    * Find project root (directory containing .git)
    */
-  // :M: api find project root directory
+  // ::: api find project root directory
   private static findProjectRoot(startDir: string): string {
     let currentDir = startDir;
     
@@ -155,14 +155,14 @@ export class IgnoreManager {
       currentDir = dirname(currentDir);
     }
     
-    // :M: ctx fallback to current directory
+    // ::: ctx fallback to current directory
     return startDir;
   }
 
   /**
    * Clear the cache (useful for testing or when files change)
    */
-  // :M: api clear ignore cache
+  // ::: api clear ignore cache
   static clearCache(): void {
     this.cache.clear();
   }

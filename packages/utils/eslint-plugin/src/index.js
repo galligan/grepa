@@ -1,4 +1,4 @@
-// :M: tldr Custom ESLint rules plugin
+// ::: tldr Custom ESLint rules plugin
 module.exports = {
   meta: {
     name: '@waymark/eslint-plugin',

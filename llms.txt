@@ -26,7 +26,7 @@ Key principles:
 ### With Properties and Hashtags
 ```python
 # todo ::: priority:high validate inputs #security
-# fix ::: assign:@alice memory leak #critical
+# fix ::: @alice memory leak #critical
 ```
 
 ### Pure Notes (no prefix)
@@ -176,7 +176,7 @@ rg ":::.*#security"    # All security issues
 ### Properties
 ```javascript
 // todo ::: fixes:#123 deadline:2024-03-01 implement auth
-// todo ::: assign:@alice priority:high fix memory leak
+// todo ::: @alice priority:high fix memory leak
 ```
 
 ### Multiple Values

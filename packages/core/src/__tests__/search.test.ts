@@ -1,4 +1,4 @@
-// :M: tldr Tests for WaymarkSearch functionality
+// ::: tldr Tests for WaymarkSearch functionality
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { writeFileSync, unlinkSync, mkdirSync, rmdirSync } from 'fs';
 import { resolve } from 'path';
@@ -10,30 +10,30 @@ describe('WaymarkSearch', () => {
   const testFile2 = `${testDir}/test2.md`;
 
   beforeAll(() => {
-    // :M: ctx create test directory and files
+    // ::: ctx create test directory and files
     mkdirSync(testDir, { recursive: true });
     
     writeFileSync(testFile1, `
-// :M: tldr Test file for search functionality
+// ::: tldr Test file for search functionality
 export function test() {
-  // :M: todo implement this function
-  // :M: sec validate all inputs
+  // ::: todo implement this function
+  // ::: sec validate all inputs
   return 42;
 }
     `.trim());
     
     writeFileSync(testFile2, `
-<!-- :M: guide Test markdown file -->
+<!-- ::: guide Test markdown file -->
 # Test Document
 
-<!-- :M: todo add more content -->
-<!-- :M: api document the API -->
+<!-- ::: todo add more content -->
+<!-- ::: api document the API -->
 Some content here.
     `.trim());
   });
 
   afterAll(() => {
-    // :M: ctx cleanup test files
+    // ::: ctx cleanup test files
     unlinkSync(testFile1);
     unlinkSync(testFile2);
     rmdirSync(testDir);
@@ -59,7 +59,7 @@ Some content here.
     if (result.ok) {
       expect(result.data).toHaveLength(2);
       const files = result.data.map((r: any) => r.anchor.file);
-      // :M: ctx globby returns absolute paths
+      // ::: ctx globby returns absolute paths
       expect(files).toContain(resolve(testFile1));
       expect(files).toContain(resolve(testFile2));
     }
@@ -126,7 +126,7 @@ Some content here.
     expect(result.ok).toBe(true);
     if (result.ok) {
       const grouped = WaymarkSearch.groupByFile(result.data);
-      // :M: ctx use absolute paths for lookup
+      // ::: ctx use absolute paths for lookup
       const absFile1 = resolve(testFile1);
       const absFile2 = resolve(testFile2);
       expect(grouped[absFile1]).toHaveLength(3); // tldr, todo, sec
@@ -148,7 +148,7 @@ Some content here.
     
     expect(result.ok).toBe(true);
     if (result.ok) {
-      // :M: ctx should find both .ts and .md files
+      // ::: ctx should find both .ts and .md files
       expect(result.data.length).toBeGreaterThan(0);
       const files = result.data.map((r: any) => r.anchor.file);
       expect(files.some((f: string) => f.endsWith('.ts'))).toBe(true);

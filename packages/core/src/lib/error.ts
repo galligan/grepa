@@ -1,9 +1,9 @@
-// :M: tldr Error handling types following TypeScript conventions
+// ::: tldr Error handling types following TypeScript conventions
 
 export type ErrorCode =
   // Parse errors
   | 'parse.invalidSyntax'     // Invalid waymark syntax
-  | 'parse.missingSpace'      // Missing space after :M:
+  | 'parse.missingSpace'      // Missing space after :::
   | 'parse.emptyPayload'      // Empty anchor payload
   | 'parse.invalidContext'    // Invalid context format
   | 'parse.tooManyContexts'   // Too many contexts on one line
@@ -40,7 +40,10 @@ export type ErrorCode =
   | 'system.outOfMemory'      // Out of memory
   | 'system.timeout'          // Operation timed out
   | 'network'                 // Network error
-  | 'unexpected';             // Unhandled exception
+  | 'unexpected'              // Unhandled exception
+
+  // Lint errors
+  | 'lint.hasIssues';         // Linting found issues
 
 export interface AppError {
   code: ErrorCode;
@@ -59,7 +62,7 @@ export const makeError = (
   cause,
 });
 
-// :M: api Maps ErrorCodes to appropriate status codes
+// ::: api Maps ErrorCodes to appropriate status codes
 function getStatusCode(code: ErrorCode): number {
   const mapping: Record<ErrorCode, number> = {
     // Parse errors - 400 Bad Request
@@ -102,6 +105,9 @@ function getStatusCode(code: ErrorCode): number {
     'system.timeout': 408,
     'network': 503,
     'unexpected': 500,
+
+    // Lint errors
+    'lint.hasIssues': 400,
   };
   return mapping[code] ?? 500;
 }

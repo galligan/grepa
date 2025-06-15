@@ -1,4 +1,4 @@
-// :M: tldr Search functionality for waymarks across files
+// ::: tldr Search functionality for waymarks across files
 import { readFile, stat } from 'fs/promises';
 import { createReadStream } from 'fs';
 import { extname } from 'path';
@@ -16,7 +16,7 @@ import * as readline from 'readline';
  * All operations are async for better performance and scalability.
  */
 export class WaymarkSearch {
-  // :M: api search configuration constants
+  // ::: api search configuration constants
   private static readonly DEFAULT_EXTENSIONS = [
     '.ts', '.js', '.jsx', '.tsx', '.md', '.txt',
     '.py', '.java', '.c', '.cpp', '.h', '.go',
@@ -31,18 +31,18 @@ export class WaymarkSearch {
    * @param options - Search options for filtering
    * @returns Promise<Result> containing search results or error
    */
-  // :M: api main search method
+  // ::: api main search method
   static async search(
     patterns: string[],
     options: SearchOptions = {}
   ): Promise<Result<SearchResult[]>> {
-    // :M: ctx validate search options
+    // ::: ctx validate search options
     const optionsValidation = searchOptionsSchema.safeParse(options);
     if (!optionsValidation.success) {
       return failure(fromZod(optionsValidation.error));
     }
 
-    // :M: ctx validate patterns
+    // ::: ctx validate patterns
     if (patterns.length === 0) {
       return failure(makeError(
         'cli.missingArgument',
@@ -50,7 +50,7 @@ export class WaymarkSearch {
       ));
     }
 
-    // :M: ctx resolve files with error handling
+    // ::: ctx resolve files with error handling
     const filesResult = await WaymarkSearch.resolveFiles(patterns, options);
     if (!filesResult.ok) {
       return filesResult;
@@ -59,7 +59,7 @@ export class WaymarkSearch {
     const results: SearchResult[] = [];
     const errors: AppError[] = [];
 
-    // :M: ctx process each file concurrently for better performance
+    // ::: ctx process each file concurrently for better performance
     const filePromises = filesResult.data.map(file => 
       WaymarkSearch.processFile(file, options)
     );
@@ -81,7 +81,7 @@ export class WaymarkSearch {
       }
     }
 
-    // :M: ctx check if we found any results
+    // ::: ctx check if we found any results
     if (results.length === 0 && errors.length === 0) {
       return failure(makeError(
         'search.noResults',
@@ -89,7 +89,7 @@ export class WaymarkSearch {
       ));
     }
 
-    // :M: ctx check for too many results
+    // ::: ctx check for too many results
     if (results.length > WaymarkSearch.MAX_RESULTS) {
       return failure(makeError(
         'search.tooManyResults',
@@ -100,13 +100,13 @@ export class WaymarkSearch {
     return success(results);
   }
 
-  // :M: api resolve file patterns to actual file paths using glob
+  // ::: api resolve file patterns to actual file paths using glob
   private static async resolveFiles(
     patterns: string[],
     options: SearchOptions
   ): Promise<Result<string[]>> {
     try {
-      // :M: ctx use globby for proper glob pattern support
+      // ::: ctx use globby for proper glob pattern support
       const globOptions = {
         absolute: true,
         onlyFiles: true,
@@ -121,7 +121,7 @@ export class WaymarkSearch {
 
       const files = await globby(patterns, globOptions);
 
-      // :M: ctx filter by extensions (case-insensitive to handle .TS, .Js, etc.)
+      // ::: ctx filter by extensions (case-insensitive to handle .TS, .Js, etc.)
       const filteredFiles = files.filter(file => {
         const ext = extname(file).toLowerCase();
         return WaymarkSearch.DEFAULT_EXTENSIONS.includes(ext);
@@ -144,12 +144,12 @@ export class WaymarkSearch {
     }
   }
 
-  // :M: api process single file with error handling
+  // ::: api process single file with error handling
   private static async processFile(
     file: string,
     options: SearchOptions
   ): Promise<Result<SearchResult[]>> {
-    // :M: ctx check file size first
+    // ::: ctx check file size first
     const statResult = await tryAsync(
       () => stat(file),
       'file.readError'
@@ -159,12 +159,12 @@ export class WaymarkSearch {
       return statResult;
     }
 
-    // :M: perf handle large files with streaming
+    // ::: perf handle large files with streaming
     if (statResult.data.size > WaymarkSearch.MAX_FILE_SIZE) {
       return WaymarkSearch.processLargeFile(file, options);
     }
 
-    // :M: ctx read file content
+    // ::: ctx read file content
     const contentResult = await tryAsync(
       () => readFile(file, 'utf-8'),
       'file.readError'
@@ -178,7 +178,7 @@ export class WaymarkSearch {
       ));
     }
 
-    // :M: ctx parse file content
+    // ::: ctx parse file content
     const parseResult = WaymarkParser.parseWithResult(
       contentResult.data,
       file
@@ -188,7 +188,7 @@ export class WaymarkSearch {
       return parseResult;
     }
 
-    // :M: ctx filter anchors based on search criteria
+    // ::: ctx filter waymarks based on search criteria
     const results: SearchResult[] = [];
     for (const anchor of parseResult.data.anchors) {
       if (WaymarkSearch.matchesSearch(anchor, options)) {
@@ -205,7 +205,7 @@ export class WaymarkSearch {
     return success(results);
   }
 
-  // :M: api check if anchor matches search criteria
+  // ::: api check if waymark matches search criteria
   private static matchesSearch(anchor: Waymark, options: SearchOptions): boolean {
     if (!options.contexts || options.contexts.length === 0) {
       return true;
@@ -218,7 +218,7 @@ export class WaymarkSearch {
     );
   }
 
-  // :M: api get context lines around an anchor
+  // ::: api get context lines around a waymark
   private static getContext(content: string, lineNumber: number, contextLines: number): {
     before: string[];
     after: string[];
@@ -227,12 +227,12 @@ export class WaymarkSearch {
     const before: string[] = [];
     const after: string[] = [];
 
-    // :M: ctx get lines before (1-indexed to 0-indexed)
+    // ::: ctx get lines before (1-indexed to 0-indexed)
     for (let i = Math.max(0, lineNumber - contextLines - 1); i < lineNumber - 1; i++) {
       before.push(lines[i] || '');
     }
 
-    // :M: ctx get lines after
+    // ::: ctx get lines after
     for (let i = lineNumber; i < Math.min(lines.length, lineNumber + contextLines); i++) {
       after.push(lines[i] || '');
     }
@@ -240,7 +240,7 @@ export class WaymarkSearch {
     return { before, after };
   }
 
-  // :M: api get all unique contexts from search results
+  // ::: api get all unique markers from search results
   static getUniqueContexts(results: SearchResult[]): string[] {
     const contexts = new Set<string>();
     results.forEach(result => {
@@ -249,7 +249,7 @@ export class WaymarkSearch {
     return Array.from(contexts).sort();
   }
 
-  // :M: api group results by context
+  // ::: api group results by marker
   static groupByContext(results: SearchResult[]): Record<string, SearchResult[]> {
     const grouped: Record<string, SearchResult[]> = {};
     
@@ -265,7 +265,7 @@ export class WaymarkSearch {
     return grouped;
   }
 
-  // :M: api group results by file
+  // ::: api group results by file
   static groupByFile(results: SearchResult[]): Record<string, SearchResult[]> {
     const grouped: Record<string, SearchResult[]> = {};
     
@@ -280,7 +280,7 @@ export class WaymarkSearch {
     return grouped;
   }
 
-  // :M: api process large files using streaming to avoid memory issues
+  // ::: api process large files using streaming to avoid memory issues
   private static async processLargeFile(
     file: string,
     options: SearchOptions
@@ -300,7 +300,7 @@ export class WaymarkSearch {
       rl.on('line', (line) => {
         lineNumber++;
         
-        // :M: ctx maintain context buffer for surrounding lines
+        // ::: ctx maintain context buffer for surrounding lines
         if (contextSize > 0) {
           contextBuffer.push(line);
           if (contextBuffer.length > contextSize * 2 + 1) {
@@ -308,10 +308,10 @@ export class WaymarkSearch {
           }
         }
 
-        // :M: ctx check for anchor in current line
-        const anchorMatch = line.indexOf(':M:');
+        // ::: ctx check for waymark in current line
+        const anchorMatch = line.indexOf(':::');
         if (anchorMatch !== -1) {
-          // :M: ctx parse the line for a valid anchor
+          // ::: ctx parse the line for a valid waymark
           const afterAnchor = line.substring(anchorMatch + 3);
           
           if (afterAnchor.startsWith(' ')) {
@@ -360,9 +360,9 @@ export class WaymarkSearch {
     });
   }
 
-  // :M: api simple payload parser for streaming (avoids full parser overhead)
+  // ::: api simple payload parser for streaming (avoids full parser overhead)
   private static parsePayloadSimple(payload: string): { contexts: string[]; prose?: string } {
-    // :M: ctx find first space not in parentheses for context/prose split
+    // ::: ctx find first space not in parentheses for marker/prose split
     let parenDepth = 0;
     let spaceIndex = -1;
     
@@ -394,7 +394,7 @@ export class WaymarkSearch {
     };
   }
 
-  // :M: api get context from buffer for streaming
+  // ::: api get context from buffer for streaming
   private static getContextFromBuffer(
     buffer: string[],
     _currentLine: number,

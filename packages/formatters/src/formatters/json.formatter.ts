@@ -1,4 +1,4 @@
-// :M: tldr JSON formatters for all data types
+// ::: tldr JSON formatters for all data types
 import type { SearchResult, ParseResult, Waymark } from '@waymark/types';
 import type {
   ISearchResultFormatter,

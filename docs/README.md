@@ -5,10 +5,10 @@ Welcome to the waymark documentation. Start here to learn about waymarks - a uni
 
 ## Quick Links
 
-- **[Quick Start Guide](./guides/quick-start.md)** - Get started in 5 minutes
-- **[Syntax Reference](./syntax.md)** - Complete waymark syntax specification
-- **[Examples](./examples.md)** - Real-world usage patterns
-- **[Conventions](./conventions.md)** - Best practices and team patterns
+- **[Quick Start Guide](./quick-start.md)** - Get started in 5 minutes
+- **[Syntax Reference](./syntax/README.md)** - Complete waymark syntax specification
+- **[Common Patterns](./usage/patterns/common-patterns.md)** - Real-world usage patterns and best practices
+- **[Search Guide](./usage/search/ripgrep-patterns.md)** - Finding waymarks with ripgrep
 
 ## What are Waymarks?
 
@@ -16,7 +16,7 @@ Waymarks are searchable markers in code comments using the `:::` sigil:
 
 ```javascript
 // todo ::: implement validation
-// warn ::: check user permissions #security
+// alert ::: check user permissions +security
 // ::: assumes UTC timestamps
 ```
 
@@ -24,57 +24,47 @@ Search them instantly:
 ```bash
 rg ":::"          # Find all waymarks
 rg "todo :::"     # Find all todos
-rg "#security"    # Find security concerns
+rg "\+security"   # Find security concerns
 ```
 
 ## Documentation Structure
 
 ### Core Documentation
 
-- **[Syntax](./syntax.md)** - The `:::` sigil, prefixes, properties, and hashtags
-- **[Examples](./examples.md)** - Patterns organized by use case
-- **[Conventions](./conventions.md)** - Essential patterns and best practices
-- **[Waymarks in Documentation](./waymarks-in-documentation.md)** - Integration with JSDoc, docstrings, etc.
+- **[Syntax](./syntax/README.md)** - The `:::` sigil, markers, properties, and tags
+- **[Common Patterns](./usage/patterns/common-patterns.md)** - Essential patterns and best practices
+- **[Tooling](./tooling/README.md)** - CLI, parser, and IDE integrations
 
-### Guides
+### Internal Documentation
 
-- **[Quick Start](./guides/quick-start.md)** - 5-minute introduction
-
-### Reference
-
-- **[About Prior Art](./about/priors.md)** - Related concepts and inspiration
-- **[Tooling API](./tooling/API.md)** - Waymark parser and search APIs
-- **[CLI Reference](./tooling/CLI.md)** - Command-line interface
-
-### Project
-
-- **[Language Guide](./project/LANGUAGE.md)** - How to write about waymarks
-- **[Archive](./project/archive/)** - Historical documentation
-- **[Proposals](./project/proposals/)** - Future enhancements
+- **[Project Docs](./_project/README.md)** - Internal documentation (proposals, decisions, research)
 
 ## Key Concepts
 
 ### The `:::` Sigil
 
-The canonical waymark sigil, optionally preceded by a prefix:
+The canonical waymark sigil, optionally preceded by a marker:
 
 ```python
 # todo ::: implement error handling
 #      ^^^
-#      └── Sigil separates prefix from content
+#      └── Sigil separates marker from content
 ```
 
-### Prefix Categories
+### Marker Categories
 
-Waymarks use prefixes to classify code locations:
+Waymarks use markers to classify code locations (~41 total in 8 categories):
 
-- **Tasks**: `todo`, `fix`, `done`, `review`
-- **Information**: `tldr`, `note`, `docs`, `why`
-- **Alerts**: `warn`, `crit`, `unsafe`, `deprecated`
-- **Meta**: `ai`, `important`, `hack`, `idea`
-- **Lifecycle**: `stub`, `draft`, `stable`, `shipped`
+- **Work**: `todo`, `fix`, `done`, `review`, `refactor`, `needs`, `blocked`
+- **State**: `temp`, `deprecated`, `draft`, `stub`, `cleanup`
+- **Alert**: `alert`, `risk`, `notice`, `always`
+- **Info**: `tldr`, `note`, `summary`, `example`, `idea`, `about`, `docs`
+- **Quality**: `test`, `audit`, `check`, `lint`, `ci`
+- **Performance**: `perf`, `hotpath`, `mem`, `io`
+- **Security**: `sec`, `auth`, `crypto`, `a11y`
+- **Meta**: `flag`, `important`, `hack`, `legal`, `must`, `assert`
 
-Plus properties (`priority:high`), hashtags (`#security`), and @mentions (`@alice`).
+Plus signals (`!todo`, `*fix`), properties (`priority:high`), tags (`+security`), and @mentions (`@alice`).
 
 ### Search Patterns
 
@@ -85,10 +75,10 @@ Find waymarks with ripgrep:
 rg "todo :::"              # All todos
 rg ":::.*@alice"           # Alice's assignments
 rg ":::.*priority:high"    # High priority items
-rg "#security"             # Security hashtag
+rg "\+security"            # Security tag
 
 # With context
-rg -C2 "warn :::"          # Warnings with 2 lines context
+rg -C2 "alert :::"         # Alerts with 2 lines context
 rg -B3 -A3 "todo :::"      # Todos with surrounding code
 ```
 
@@ -108,7 +98,7 @@ rg -B3 -A3 "todo :::"      # Todos with surrounding code
    # => example.js:1:// todo ::: add input validation
    ```
 
-3. **Learn patterns** in the [Quick Start Guide](./guides/quick-start.md)
+3. **Learn patterns** in the [Quick Start Guide](./quick-start.md)
 
 ## Philosophy
 

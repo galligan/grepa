@@ -26,9 +26,15 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^6.19.0
         version: 6.21.0(eslint@8.57.1)(typescript@5.8.3)
+      chalk:
+        specifier: ^5.4.1
+        version: 5.4.1
       eslint:
         specifier: ^8.56.0
         version: 8.57.1
+      globby:
+        specifier: ^14.1.0
+        version: 14.1.0
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -59,6 +65,9 @@ importers:
       commander:
         specifier: ^12.0.0
         version: 12.1.0
+      globby:
+        specifier: ^14.1.0
+        version: 14.1.0
 
   packages/core:
     dependencies:

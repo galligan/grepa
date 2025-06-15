@@ -1,4 +1,4 @@
-&lt;!-- tldr ::: Contributing guidelines for the Waymark project --&gt;
+<!-- tldr ::: Contributing guidelines for the Waymark project -->
 
 # Contributing to Waymark
 
@@ -86,12 +86,12 @@ We follow strict TypeScript conventions:
 Use waymarks in your code:
 
 ```typescript
-// tldr ::: Brief description of the module
+// tldr ::: [Brief description of the module]
 export class MyClass {
-  // note ::: Public method documentation
+  // note ::: [Public method documentation]
   public myMethod(): Result<string> {
-    // ::: Important context or assumptions
-    // warn ::: Security considerations #security
+    // ::: [Important context or assumptions]
+    // alert ::: [Security considerations +security]
   }
 }
 ```
@@ -141,8 +141,9 @@ We use changesets for releases:
 ## Questions?
 
 Feel free to:
+
 - Open an issue for bugs or features
 - Start a discussion for questions
 - Check existing issues before creating new ones
 
-Thank you for contributing! 🔱
+Thank you for contributing! 🪧
